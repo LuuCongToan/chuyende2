@@ -1,0 +1,90 @@
+
+    {% extends 'baseindex.html' %}
+    {% load static %}
+    {% block body_block %}
+<div class="row">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active "  href="{% url 'friends' %}" role="tab">Friends Suggestion</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link  " href="{% url 'friend_list' %}" role="tab">List Friends</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link "  href="{% url 'friend_requests' %}" role="tab">Friend Requests</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link "  href="{% url 'list_block' user.id %}" role="tab">List Block</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link "  href="{% url 'list_follow' user.id %}" role="tab">List Follow</a>
+        </li>
+        
+    </ul>
+    {% for user in users %}
+    {% if user.user != request.user %}
+    <div class="col-xl-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ user.profile_pic.url }}" alt="" style="width: 45px; height: 45px" class="rounded-circle">
+                        <div class="ms-3">
+                            <p class="fw-bold mb-1 name">
+                                <a style="text-decoration: none; color:#626262; hover-color:aqua" href="{% url 'other_profile' user.id %}">
+                                    {{ user.nickname }}
+                                </a>
+                            </p>
+                            <p class="text-muted mb-0 email">{{ user.user.email }}</p>
+                           
+                            <div class="card-footer border-0 bg-light p-2 justify-content-around">
+                                {% if user.user in friends.user.all %}
+                                    <p class="text-success">Bạn bè</p>
+                                {% elif user.user in request.user.sent_requests.all and user.user not in request.user.received_requests.all %}
+                                    <p class="text-muted">Đang chờ xác nhận</p>
+                                {% else %}
+                                    <form action="{% url 'add_friend' user.user.id %}" method="post">
+                                        {% csrf_token %}                             
+                                        <button type="submit" style="border: none; border-radius: 5px;padding: 2px;">
+                                            <i class="fas fa-user-plus fa-beat"></i>Add Friends
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'follow_user' user.id %}">
+                                        <button type="submit" style="border: none; border-radius: 5px;padding: 2px;">
+                                            <i class="fa-solid fa-square-plus fa-beat"></i>Follow
+                                        </button>
+                                    </a>
+                                    <a href="{% url 'block_user' user.id %}">
+                                        <button type="submit" style="border: none; border-radius: 5px;padding: 2px;">
+                                            <i class="fa-solid fa-user-lock fa-fade" style="color: #ff0a0a;"></i>Block
+                                        </button>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+</div>
+<style>
+    .email {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+
+    .name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+</style>
+
+
+{% endblock %}

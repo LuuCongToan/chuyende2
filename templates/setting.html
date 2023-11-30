@@ -1,0 +1,155 @@
+{% extends 'baseindex.html' %}
+{% block body_block %}
+  {% load static %}
+  {% if error_message %}
+  <script>
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      var toast = new bootstrap.Toast(document.getElementById('toast'));
+      toast.show();
+    });
+  </script>
+  {% endif %}
+  <div id="toast" class="toast justify-content-center align-items-center" style="margin: auto;" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-body">
+      <p>{{ error_message }}</p>
+      <div class="mt-2 pt-2 border-top">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="border border-2">
+    <div class="post-upload-textarea p-0">
+      <div class="user-profile d-block">
+        <div style="text-align: center;"><img src="{{ user_profile.profile_pic.url }}" style="width: 75px; height: 75px;margin-top: 1cm;" alt="" />
+         
+        </div>
+        <div style="text-align: center; pad">{{ user_profile.nickname }}</div>
+      </div>
+      <div class="justify-content-center" style="padding-left: 2cm;margin: 15px;">
+        <p>
+          <i class="fa-solid fa-pen-nib" style="color: #6452bc;padding: 5px;"></i>Bio: {{ user_profile.bio}}
+        </p>
+        <p>
+          <i class="fa-solid fa-user" style="color: #6452bc;padding: 5px;"></i>Username: {{ user_profile.user.username }}
+        </p>
+        <p>
+          <i class="fa-solid fa-envelope" style="color: #6452bc;padding: 5px;"></i>Email: {{ user_profile.user.email }}
+        </p>
+        <a href="{{ user_profile.portfolio_site }}" style="text-decoration: none;">
+          <i class="fa-solid fa-paperclip" style="color: #6452bc;padding: 5px;"></i>
+          Portfolio_site: {{ user_profile.portfolio_site }}
+        </a>
+      </div>
+
+      <div class="justify-content-center border border-1 p-2" style="margin: 30px;">
+        <p>
+          <i class="fa-solid fa-gears" style="color: #4a9cb0;padding: 5px;"></i>Setting
+        </p>
+        <p style="padding-left: 20px;">
+          <button class="" style="width: 100%;text-align: left;border: none;border-radius: 8px;padding: 5px;background-color: #f5f1f1;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample3" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fa-solid fa-pen-nib" style="color: #4a9cb0;padding: 5px;"></i>
+            Change Bio & NickName
+            <i class="fa-solid fa-caret-up fa-rotate-180" style="color: #3867b7;"></i>
+          </button>
+        </p>
+        <div class="collapse p-2" id="collapseExample3">
+          <div class="card card-body">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="bio" />
+
+              <div class="mb-3">
+                <label for="name" class="form-label">Bio:</label>
+                <input class="form-control" type="text" id="bio" placeholder="{{ user_profile.bio}}" value="{{ user_profile.bio}}" name="bio" />
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Nickname:</label>
+                <input class="form-control" type="text" id="nickname" placeholder="{{ user_profile.nickname}}" value="{{ user_profile.nickname}}" name="nickname" />
+
+               </div>
+              <button type="submit" class="btn btn-info">Save</button>
+            </form>
+          </div>
+        </div>
+        <p style="padding-left: 20px;">
+          <button class="" style="width: 100%;text-align: left;border: none;border-radius: 8px;padding: 5px;background-color: #f5f1f1;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fa-solid fa-key" style="color: #4a9cb0;padding: 5px;"></i>
+            Change Password
+            <i class="fa-solid fa-caret-up fa-rotate-180" style="color: #3867b7;"></i>
+          </button>
+        </p>
+        <div class="collapse p-2" id="collapseExample">
+          <div class="card card-body">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="pass" />
+
+              <div class="mb-3">
+                <label for="name" class="form-label">Old password:</label>
+                <input class="form-control" type="password" id="password" placeholder="password" name="password" />
+              </div>
+              <input class="form-control" id="members" type="hidden" value="{{ user_profile.user }}" name="members" />
+              <div class="mb-3">
+                <label for="description" class="form-label">A new password:</label>
+                <input class="form-control" type="password" id="new_password" name="new_password" placeholder="new_password" rows="3" />
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Enter a new password:</label>
+                <input class="form-control" type="password" id="confirm_password" name="confirm_password" placeholder="confirm_password" rows="3" />
+              </div>
+
+              <button type="submit" class="btn btn-info">Save</button>
+            </form>
+          </div>
+        </div>
+
+        <p style="padding-left: 20px;">
+          <button class="" style="width: 100%;text-align: left;border: none;border-radius: 8px;padding: 5px;background-color: #f5f1f1;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fa-solid fa-id-card" style="color: #4a9cb0;padding: 5px;"></i>
+            Change Avarta & Portfolio_site
+            <i class="fa-solid fa-caret-up fa-rotate-180" style="color: #3867b7;"></i>
+          </button>
+        </p>
+
+        <div class="collapse p-2" id="collapseExample1">
+          <div class="card card-body">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="avt" />
+    
+              {{ form.as_p }}
+    
+              <button type="submit" class="btn btn-info">Save</button>
+            </form>
+          </div>
+        </div>
+        
+        <p style="padding-left: 20px;">
+          <button class="" style="width: 100%;text-align: left;border: none;border-radius: 8px;padding: 5px;background-color: #f5f1f1;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fa-solid fa-envelope" style="color: #4a9cb0;padding: 5px;"></i>
+            Change Email
+            <i class="fa-solid fa-caret-up fa-rotate-180" style="color: #3867b7;"></i>
+          </button>
+        </p>
+
+        <div class="collapse p-2" id="collapseExample2">
+          <div class="card card-body">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="email" />
+    
+              <div class="mb-3">
+                <label for="description" class="form-label">Email:</label>
+                <input class="form-control" type="email" id="email" name="email" placeholder="Email" rows="3" />
+              </div>
+              <button type="submit" class="btn btn-info">Save</button>
+            </form>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'css/homeindex.css' %}" rel="stylesheet" type="text/css" media="all"/>
+    <title>Socialbook</title>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://kit.fontawesome.com/3a4b0951d6.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="{% url 'profileindex' %}">
+                <img  class="logo" src="{% static 'images/logo.png' %}" alt="">
+            </a>
+            <ul class="navlogo">
+                <li><img src="{% static 'images/notification.png' %}"></li>
+                <li><img src="{% static 'images/inbox.png' %}"></li>
+                <li><img src="{% static 'images/video.png' %}"></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <div class="search-box">
+                <form action="{% url 'search' %}" method="get">
+                    
+                    <input type="text" name="q" placeholder="Tìm kiếm">
+                    <button class="btn btn-outline-primary m-1" type="submit"><img src="{% static 'images/search.png' %}" alt=""></button>
+                  </form>
+                
+                
+            </div>
+            <div class="profile-image online" onclick="UserSettingToggle()">
+                <img src="{{ user_profile.profile_pic.url }}" style="width: 45px; height: 45px" alt="">
+            </div>
+
+        </div>
+        <div class="user-settings">
+            <div class="profile-darkButton">
+            <div class="user-profile">
+                <img  src="{{ user_profile.profile_pic.url }}" alt="" style="width: 45px; height: 45px">
+                <div>
+                    <p> {{ user_profile.nickname }}</p>
+                    <a href="{% url 'profile' %}">See your profile</a>
+                </div>
+            </div>
+            <div id="dark-button" onclick="darkModeON()">
+                <span></span>
+            </div>
+            </div>
+            <hr>
+            
+            <hr>
+            <div class="settings-links">
+                <img src="{% static 'images/setting.png' %}" alt="" class="settings-icon">
+                <a href="{% url 'setting'%}">Settings or Privary <img src="images/arrow.png" alt=""></a>
+            </div>
+            <div class="settings-links">
+                <img src="{% static 'images/Display.png' %}" alt="" class="settings-icon">
+                <a href="#">Display or Accessibility <img src="{% static 'images/arrow.png' %}" alt=""></a>
+            </div>
+
+            <div class="settings-links">
+                <img src="{% static 'images/logout.png' %}" alt="" class="settings-icon">
+                <a href="{% url 'user_login' %}">Logout <img src="{% static 'images/arrow.png' %}" alt=""></a>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- content-area-->
+
+    <div class="container">
+        <div class="left-sidebar">
+            <div class="important-links">
+               
+                <a href="{% url 'profileindex' %}"><img src="{% static 'images/profile-home.png' %}" alt="">Home</a>
+                <a href="{% url 'profile' %}"><img src="{% static 'images/news.png' %}" alt="">Profile</a>
+                <a href="{% url 'friends' %}"><img src="{% static 'images/friends.png' %}" alt="">Friends</a>
+                <a href="{% url 'all_groups' %}"><img src="{% static 'images/group.png' %}" alt="">Groups</a>
+                <a href="{% url 'all_page' %}"><i class="fa-solid fa-pager fa-xl" style="color: #1876f2 ;padding-right: 20px;"></i>Page</a>
+
+                <a href="#">See More</a>
+            </div>
+
+            <div class="shortcut-links">
+                 {% comment %}hiển thị group{% endcomment %}
+  <div class="status-field-container write-post-container border border-2">
+    <small><h6 class="m-0">Your Group</h6></small>
+   
+    {% for group in groups %}
+      {% if user_profile.user.username == group.created_by.user.username %}
+        <div class="status-field-container write-post-container border border-1 p-1 m-1">
+          <div class="user-profile-box">
+            <div class="user-profile">          
+              <div>
+              
+                  <p class="m-0"><a class="m-0" href="{% url 'groupindex' id=group.id %}">{{ group.name }}</a></p>
+                
+                <small>Members: {{ group.members.count }}</small>
+                <small>Created By: {{ group.created_by.nickname }}</small>
+              </div>
+            </div>             
+          </div>
+          <div class="status-field">
+            <p class="m-0">{{ group.description }}</p>
+          </div>
+        </div>
+      {% endif %}
+      {% endfor %}
+  </div>
+    </div>
+        </div>
+
+        <!-- main-content -->
+        <div class="content-area">
+        {% block body_block %}
+
+        
+        {% endblock %}
+        </div>
+        <!-- sidebar------------ -->
+        <div class="right-sidebar">
+            <div class="heading-link">
+                
+                <h5 style="margin: 0cm;"><img style="width: 10%;margin: 1px;" src="{% static 'images/live-video.png' %}" alt="">Entertainment</h5>
+                <a href="https://www.youtube.com/">See All</a>
+            </div>
+
+            <div class="events">
+                <iframe width="260" height="150" src="https://www.youtube.com/embed/UH_xvJzrFlI?si=t7sludxQPPbqzo6e" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            
+
+            <div class="heading-link">
+                <h4>Friends</h4>
+                <a href="{% url 'friend_list'%}">Show All</a>
+            </div>
+            {% for friend in friends %}
+            <div class="online-list">
+                <div class="online">
+                    <img src="{{ friend.profile_pic.url }}" alt="" style="width: 45px; height: 45px">
+                </div>
+                <p ><a style="text-decoration: none; color:#626262; hover-color:aqua" href="{% url 'other_profile' id=friend.user.id %}" id="user_{{ friend.user.id }}">
+                    {{ friend.nickname }}</a></p>
+            </div>
+            {% empty %}
+            <li>No friends found.</li>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="{% static 'js/function.min.js' %}"></script>
+</body>
+</html>

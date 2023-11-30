@@ -1,0 +1,381 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="{% static 'css/homeindex.css' %}" rel="stylesheet" type="text/css" media="all" />
+    <title>Profle - Socialbook</title>
+	<link href="{% static 'css/profile.css' %}" rel="stylesheet" type="text/css" media="all"/>
+  <script src="https://kit.fontawesome.com/3a4b0951d6.js" crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://kit.fontawesome.com/ef7e2b893b.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+    
+    
+    <nav class="navbar">
+      <div class="nav-left">
+          <a href="{% url 'profileindex' %}">
+              <img  class="logo" src="{% static 'images/logo.png' %}" alt="">
+          </a>
+          <ul class="navlogo">
+              <li><img src="{% static 'images/notification.png' %}"></li>
+              <li><img src="{% static 'images/inbox.png' %}"></li>
+              <li><img src="{% static 'images/video.png' %}"></li>
+          </ul>
+      </div>
+      <div class="nav-right">
+          <div class="search-box">
+              <form action="{% url 'search' %}" method="get">
+                  
+                  <input type="text" name="q" placeholder="Tìm kiếm">
+                  <button class="btn btn-outline-primary m-1" type="submit"><img src="{% static 'images/search.png' %}" alt=""></button>
+                </form>
+              
+              
+          </div>
+          <div class="profile-image online" onclick="UserSettingToggle()">
+              <img src="{{ user_profile.profile_pic.url }}" style="width: 45px; height: 45px" alt="">
+          </div>
+
+      </div>
+      <div class="user-settings">
+          <div class="profile-darkButton">
+          <div class="user-profile">
+              <img  src="{{ user_profile.profile_pic.url }}" alt="" style="width: 45px; height: 45px">
+              <div>
+                <p> {{ user_profile.nickname }}</p>
+                  <a href="{% url 'profile' %}">See your profile</a>
+              </div>
+          </div>
+          <div id="dark-button" onclick="darkModeON()">
+              <span></span>
+          </div>
+          </div>
+          <hr>
+          
+          <hr>
+          <div class="settings-links">
+              <img src="{% static 'images/setting.png' %}" alt="" class="settings-icon">
+              <a href="{% url 'setting'%}">Settings or Privary <img src="images/arrow.png" alt=""></a>
+          </div>
+          <div class="settings-links">
+              <img src="{% static 'images/Display.png' %}" alt="" class="settings-icon">
+              <a href="#">Display or Accessibility <img src="{% static 'images/arrow.png' %}" alt=""></a>
+          </div>
+
+          <div class="settings-links">
+              <img src="{% static 'images/logout.png' %}" alt="" class="settings-icon">
+              <a href="{% url 'user_login' %}">Logout <img src="{% static 'images/arrow.png' %}" alt=""></a>
+          </div>
+
+      </div>
+  </nav>
+
+    <!-- profile-page--- -->
+   
+    <div class="profile-container ">
+      <img src="images/cover.png" class="coverImage" alt="" />
+      <div class="dashboard border border-1 "style="background-color: #f6f6f6;">
+        <div class="left-dashboard ">
+          <img src="{{ user_profile.profile_pic.url }}" style="width: 8%" class="dashboard-img" alt="" />
+          <div class="left-dashboard-info">
+            <h5>{{ user_profile.nickname }}<a style="padding-left: 5px;" href="{% url 'setting' %}"><i  class="fa-solid fa-pen-to-square"></i></a></h5>
+            <p style="margin: auto;">
+              Bio: {{ user_profile.bio }}</p>
+            <p>{{friends.count}} Friends</p>
+            <div class="mutual-friend-images">
+              {% for friend in user_profile.friends.all %}
+              <img src="{{ friend.profile_pic.url }}" alt="" style="width: 35px; height: 35px">
+            
+            {% empty %}
+            <li>No friends found.</li>
+            {% endfor %}
+
+            </div>
+          </div>
+        </div>
+        <div class="right-dashboard-info">
+          <div class="right-dashboard-info-top">
+            <button type="button"><i class="far fa-envelope"></i> messages</button>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="container content-profile-container">
+        <div class="left-sidebar profile-left-sidebar ">
+          <div class="left-profile-sidebar-top gallery border border-1 "style="background-color: #f6f6f6;">
+            <div class="heading-link profile-heading-link">
+              <h4>Photos</h4>
+              <!-- Nút "All photo" để hiển thị tất cả các hình ảnh -->
+              <button class="btn-show-all-photo btn btn-light" >
+              <a >All Photos</a></button>
+              <button type="button" class="btnclose btn-close" aria-label="Close"></button>
+
+            </div>
+            <div class="gallery-photos">
+              
+                <div class="gallery-photos-rowFirst" id="six-photo">
+                  <!-- Hiển thị tối đa 6 hình ảnh ban đầu -->
+                  {% for image in all_images %}
+                     {% if forloop.counter <= 6 %}
+                         <img src="{{ image.images.url }}" alt="" class="gallery-img">
+                     {% endif %}
+                    {% endfor %}
+                </div>
+              
+              <!-- Thẻ HTML chứa tất cả các hình ảnh -->
+               <div class="gallery-photos-rowFirst" id="all-photos">
+                  {% for image in all_images %}
+                      <img src="{{ image.images.url }}" alt="" class="all-photo-img">
+                  {% endfor %}
+                </div>
+            </div>
+          </div>
+          <div class="left-profile-sidebar-top gallery border border-1 "style="background-color: #f6f6f6;">
+            <div class="heading-link profile-heading-link">
+              <h4>Friends</h4>
+              <a href="">All Friends</a>
+            </div>
+
+            <div class="gallery-photos">
+              <div class="gallery-photos-rowFirst">
+                {% for friend in user_profile.friends.all %}
+                <div class="first-friend">
+                  <img src="{{ friend.profile_pic.url }}" alt="" style="width: 80px; height: 80px">
+                  <p style="text-align: center;width: 80px; height: 80px">{{friend.nickname}}</p>
+                </div>
+              
+              {% empty %}
+              <li>No friends found.</li>
+              {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- main-đăng bài- -->
+
+        <div class="content-area profile-content-area ">
+          <div class="write-post-container border border-1 "style="background-color: #f6f6f6;">
+            <div class="user-profile">
+              <img src="{{ user_profile.profile_pic.url }}" style="width: 45px; height: 45px" alt="" />
+              <div>
+                <p>{{ user_profile.nickname }}</p>
+                <small>Public <i class="fas fa-caret-down"></i></small>
+              </div>
+            </div>
+
+            <div class="post-upload-textarea ">
+              <form method="post" onsubmit="return validateTextArea()"  enctype="multipart/form-data" id="myForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="post">
+                <textarea class="title" name="title" placeholder="What's on your mind?" id="title" cols="30" rows="3"></textarea>
+                <div class="add-post-links" id="preview">
+                  {% comment %} <a href="" id="upload-btn"><img src="{% static 'images/photo.png' %}" alt="" />Photo/Video</a>
+                  <input type="file" name="images" id="images" multiple />
+                  {% endcomment %}
+                  <label for="images" id="upload-btn">
+                    <a>
+                      <img src="{% static 'images/photo.png' %}" alt="" />
+                      Photo
+                    </a>
+                  </label>
+                  <input type="file" name="images" id="images" multiple style="display:none;" />
+                  <a href="{% url 'create_post' %}"><img src="{% static 'images/feeling.png' %}" alt="" />Feeling Activity</a>
+                  <button type="submit" class="btn btn-primary">Đăng</button>
+
+                  <script src="https://cdn.jsdelivr.net/npm/cropperjs@latest/dist/cropper.min.js"></script>
+                  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@latest/dist/cropper.min.css" />
+
+                  <script>
+                    
+                    const form = document.getElementById('myForm')
+                    const input = document.getElementById('images')
+                    const preview = document.getElementById('preview')
+                    
+                    input.addEventListener('change', (event) => {
+                      // lấy tệp được chọn
+                      const files = event.target.files
+                    
+                      for (let i = 0; i < files.length; i++) {
+                        const file = files[i]
+                        const reader = new FileReader()
+                    
+                        reader.onload = (e) => {
+                          const newImage = document.createElement('img')
+                          newImage.setAttribute('src', e.target.result)
+                          preview.appendChild(newImage)
+                    
+                          newImage.width = 100
+                          newImage.height = 100 * (newImage.naturalHeight / newImage.naturalWidth)
+                        }
+                    
+                        reader.readAsDataURL(file)
+                      }
+                    })
+                    function validateTextArea() {
+                      var textarea = document.getElementById("title");
+                      if (textarea.value.trim() == "") {
+                          return false;
+                      }
+                      else {
+                          return true;
+                      }
+                  }
+                  </script>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {% comment %}Bài viết{% endcomment %}
+          {% for post in posts %}
+            <div class="status-field-container write-post-container border border-1 "style="background-color: #f6f6f6;">
+              <div class="user-profile-box">
+                <div class="user-profile">
+                  <img src="{{ user_profile.profile_pic.url }}" style="width: 45px; height: 45px" alt="" />
+                  <div>
+                    <p>{{ user_profile.nickname }}</p>
+                    <small>{{ post.created_at }}</small>
+                  </div>
+                </div>
+                <div>
+                 {% comment %} nút sửa,xóa {% endcomment %}
+                  <button type="button" class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#demo{{post.id}}"><i class="fas fa-ellipsis-v"></i></button>
+                  <div id="demo{{post.id}}" class="collapse">
+                    <form action={% url 'delete_post' %} method="POST">
+                      {% csrf_token %}
+                      <input type="hidden" name="post_id" value="{{ post.id }}">
+                      <button class="btn btn-danger m-2"  type="submit">Delete</button>
+                    </form>
+
+                    <div class="">
+                    <button type="button" class="btn btn-secondary m-2" data-bs-toggle="collapse" data-bs-target="#delete{{post.id}}">Edit</button>
+                    <div id="delete{{post.id}}" class="collapse">
+                      <form action= {% url 'edit_post' %} method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                          <label for="title" class="form-label">Title:</label>
+                          <input class="form-control" value="{{ post.title }}" type="text" id="title" name="title" />
+                        </div>
+                        
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        <div class="mb-3">
+                          <label for="description" class="form-label">Photo:</label>
+                          <div class="file-upload-wrapper">
+                            <input type="file" id="images" value="{{ post.image_set.all }}" multiple name ="images" class="file-upload" />
+                          
+                          </div>
+                          <script>$('.file-upload').file_upload();</script>
+
+                        </div>
+                        <button type="submit" class="m-2 btn btn-primary">Edit</button>
+                      </form>
+  
+                      
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              </div>
+              <div class="status-field"style="display: block;
+              overflow: hidden;">
+                <p>{{ post.title }}</p>
+
+                {% for image in post.image_set.all %}
+                {%if post.image_set.count == 1 %}
+                  <img style="width: 50%;display: block;
+                  margin-left: auto;
+                  margin-right: auto; " src="{{ image.images.url }}" />
+                  {%else%}
+                  <img style="width: 40%;
+                  float: left
+                  padding: 5px; "
+                   src="{{ image.images.url }}" />
+                  {%endif%}
+                {% endfor %}
+              </div>
+              {% comment %}tym va bình luận{% endcomment %}
+              <!-- Nút like -->
+              <div class="post-reaction">
+                <div class="activity-icons">
+                  <div>
+                    <button style="border: none;background-color: #ffffff;" type="button" onclick="likePost({{ post.id }})">
+                      <img src="{% static 'images/like.png' %}" alt="" />
+                      <span>{% with likes=post.like_set.all %}
+                        {{ likes.count }} 
+                      {% endwith %}</span>
+                    </button>
+                  </div>
+                  <div>
+                      <button style="border: none;background-color: #ffffff;" type="button" onclick="addComment({{ post.id }})">
+                        <img src="{% static 'images/comments.png' %}" alt="" />
+                        <span>{{ post.num_comment }}</span>
+                      </button>
+                  </div>
+                  <div>
+                    <img src="{% static 'images/share.png' %}" alt="" />35
+                  </div> </br>
+
+                  <div id="postComments_{{ post.id }}">
+                    <ul>
+                      {% for comment in comments %}
+                        {% if post.id == comment.post.id %}
+                        <div class="d-block m-3">
+                          <div class="  rounded p-2 " style=" background-color: #f0f2f5;  display: block;">
+                          <div>
+                          <img src="{{ comment.author.profile_pic.url }}" style="width: 30px; height: 30px; border-radius: 50%;" alt="" />
+                           <strong >{{ comment.author.nickname }}</strong>
+                          </div>
+                           <br>
+                            <p class="ps-5" style="margin: auto;">{{ comment.content }}</p>
+                          
+                          
+                          </div>
+                          <small class="p-3">{{ comment.created_at|timesince  }}</small>
+                        </div>
+                        {% endif %}
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  <!-- Form để thêm bình luận -->
+                  <div class="form-check-inline ">           
+                    <form method="post" class="row g-2" enctype="multipart/form-data" id="add-comment-form">
+                      {% csrf_token %}
+                       <input type="hidden" name="action" value="comment"> 
+                        <input type="hidden" name="post_id" value="{{ post.id }}" />
+                        <div class="col-auto ms-5">
+                        <input class="form-control"  placeholder="Comment"  name="content">
+                      </div>
+                      <div class="col-auto">
+                        <button class = "create-comment btn btn-info" type="submit">Comment</button></input>
+                      </div>
+                      </form>
+                    </div>
+        
+                </div>
+                <div class="post-profile-picture">
+                  <img src="images/profile-pic.png " alt="" /> <i class="fas fa-caret-down"></i>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+
+          <button type="button" class="btn-LoadMore" onclick="LoadMoreToggle()">Load More</button>
+        </div>
+      </div>
+    </div>
+    <footer id="footer">
+      <p>Nhóm 4</p>
+    </footer>
+    <script src="{% static 'js/function.min.js' %}"></script>
+  </body>
+</html>

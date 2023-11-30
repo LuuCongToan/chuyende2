@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+</head>
+<body>
+    <h2>Chat Room: {{ room_name }}</h2>
+    <div id="chat-log"></div>
+    <input id="chat-message-input" type="text" />
+    <button id="chat-message-submit" type="button">Send</button>
+
+    <script>
+        var roomName = "{{ room_name }}";
+        var chatSocket = new WebSocket(
+            'ws://' + window.location.host +
+            '/ws/chat/' + roomName + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            var data = JSON.parse(e.data);
+            var message = data.message;
+            var sender = data.sender;
+            var recipient = data.recipient;
+
+            var chatLog = document.querySelector('#chat-log');
+            var newMessage = document.createElement('p');
+            newMessage.innerHTML = '<strong>' + sender + ':</strong> ' + message;
+            chatLog.appendChild(newMessage);
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            var messageInputDom = document.querySelector('#chat-message-input');
+            var message = messageInputDom.value;
+            var sender = 'user1';  // Thay đổi tên ngườidùng
+            var recipient = 'user2';  // Thay đổi tên người nhận
+
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'sender': sender,
+                'recipient': recipient
+            }));
+
+            messageInputDom.value = '';
+        };
+    </script>
+</body>
+</html>

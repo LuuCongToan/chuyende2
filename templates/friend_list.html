@@ -1,0 +1,83 @@
+
+    {% extends 'baseindex.html' %}
+    {% load static %}
+    {% block body_block %}
+<div class="row">  
+       
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link "  href="{% url 'friends' %}" role="tab">Friends Suggestion</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active " href="{% url 'friend_list' %}" role="tab">List Friends</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link "  href="{% url 'friend_requests' %}" role="tab">Friend Requests</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link "  href="{% url 'list_block' user.id %}" role="tab">List Block</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link "  href="{% url 'list_follow' user.id %}" role="tab">List Follow</a>
+        </li>
+        
+    </ul>
+    {% for friend in friends %}
+    <div class="col-xl-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ friend.profile_pic.url }}" alt="" style="width: 45px; height: 45px"
+                            class="rounded-circle">
+                        <div class="ms-3">
+                            
+                            <p class="fw-bold mb-1 name"><a style="text-decoration: none; color:#626262; hover-color:aqua" href="{% url 'other_profile' friend.id %}">{{ friend.nickname }}</a></p>
+                            <p class="text-muted mb-0 email">{{ friend.user.email }}</p>
+                            <form id="deleteForm" action="{% url 'delete_friend' friend.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" style="border: none; border-radius: 5px;padding: 2px;"><i class="fa-solid fa-user-pen pe-2"></i>UnFriends</button>
+                            </form>
+                        </div>
+                    </div>
+                    <span class="badge rounded-pill bg-success">Active</span>
+                </div>
+            </div>
+            <div class="card-footer border-0 bg-light p-2 d-flex justify-content-around">
+               
+                
+                
+
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <li>No friends found.</li>
+    {% endfor %}
+</div>
+<script>
+    document.getElementById("deleteForm").addEventListener("submit", function(event) {
+event.preventDefault(); // Ngăn chặn gửi yêu cầu POST mặc định
+
+        // Hiển thị hộp thoại xác nhận
+        var confirmDelete = confirm("Are you sure you want to delete this friend?");
+        if (confirmDelete) {
+this.submit(); // Gửi yêu cầu POST khi người dùng xác nhận
+        }
+    });
+</script>
+<style>
+    .email {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+.name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+</style>
+{% endblock %}

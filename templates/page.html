@@ -1,0 +1,272 @@
+{% extends 'baseindex.html' %}
+{% block body_block %}
+  {% load static %}
+
+  <div class="story-gallery border border-2">
+    <p class="m-3">Create Page</p>
+    <button class="btn btn-primary m-2" id="show-form-btn">Create</button>
+  </div>
+
+  <!-- Các trường và nút submit trong form -->
+
+  <div style="display: none; " id="my-form" class="write-post-container border border-5">
+    <div class="user-profile">
+      <img src="{{ user_profile.profile_pic.url }}" alt="" />
+      <div>
+        <p>{{ user_profile.nickname }}</p>
+        <button class="btn btn-danger m-2" id="un-form-btn">Close</button>
+      </div>
+    </div>
+
+    <div class="post-upload-textarea">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_page"> 
+        <div class="mb-3">
+          <label for="name" class="form-label">Name Page:</label>
+          <input class="form-control" type="text" id="name" placeholder="Add Name" name="name" />
+        </div>
+        <input class="form-control" id="members" type="hidden" value="{{ user_profile.user }}" name="members" />
+        <div class="mb-3">
+          <label for="description" class="form-label">Description Page:</label>
+          <textarea class="form-control" id="description" name="description" placeholder="Add description" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </form>
+    </div>
+  </div>
+  
+
+  <script>
+        const showBtn = document.querySelector('#show-form-btn');
+        const unBtn = document.querySelector('#un-form-btn');
+        const myForm = document.querySelector('#my-form');
+      
+        // Thêm sự kiện click cho button
+        showBtn.addEventListener('click', function() {
+          // Xóa lớp 'hidden' trên form
+          myForm.style.display = 'block';
+        });
+        unBtn.addEventListener('click', function() {
+            // Xóa lớp 'hidden' trên form
+            myForm.style.display = 'none';
+          });
+      </script>
+  {% comment %}hiển thị{% endcomment %}
+  <div class="status-field-container write-post-container border border-2">
+    <small><h4>Your Page</h4></small>
+   
+    {% for page in pages %}
+      {% if user_profile.user.username == page.created_by.user.username %}
+        <div class="status-field-container write-post-container border border-2">
+          <div class="user-profile-box">
+            <div class="user-profile">          
+              <div>
+                <p>
+                  <p class="m-0"><a class="m-0" href="{% url 'page_index' id=page.id %}">{{ page.name }}</a></p>
+
+                </p>
+                <small>Follow: {{ page.follow.count }}</small>
+                <small>Created By: {{ page.created_by.nickname }}</small>
+              </div>
+            </div>  
+            <div>
+              <p>
+                <a class="btn" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  <i class="fas fa-ellipsis-v"></i>
+                </a> 
+              </p>
+              <div class="collapse" id="collapseExample1">
+                <div class="card card-body">   
+                                
+               <div>
+                  <form action={% url 'delete_page' %} method="POST">
+                    {% csrf_token %}
+                      <input type="hidden" name="page_id" value="{{ page.id }}">
+                    <button class="btn btn-danger m-2"  type="submit">Delete</button>
+                   </form>
+              </div>
+                <button class="edit_group btn btn-secondary m-2" id ="edit_group_{{ page.id }}" >Edit</button>
+                </div>
+              </div>
+             
+            </div>
+            
+          </div>
+          {% comment %} <div class="status-field">
+            <p>{{ page.description }}</p>
+          </div> {% endcomment %}
+          
+        </div>
+     
+      <div style="display: none; " id="form-edit_{{ page.id }}" class="form-edit post-upload-textarea write-post-container border border-5">
+        <button class="un-form-edit btn btn-danger m-2" id="un-form-edit_{{ page.id }}">Close</button>
+        <form action= {% url 'edit_page' %} method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% comment %} <input type="hidden" name="action" value="add_group">  {% endcomment %}
+          <div class="mb-3">
+            <label for="name" class="form-label">Name Page:</label>
+            <input class="form-control" value="{{ page.name }}" type="text" id="name" name="name" />
+          </div>
+          
+          <input type="hidden" name="page_id" value="{{ page.id }}">
+          <div class="mb-3">
+            <label for="description" class="form-label">Description Page:</label>
+            <textarea class="form-control" id="description" placeholder="{{ page.description }}" name="description" rows="3">{{ page.description }}</textarea>
+         
+          </div>
+          <button type="submit" class="m-2 btn btn-primary">Edit</button>
+        </form>
+      </div>
+         
+      {% endif %}
+    
+      {% endfor %}
+      
+  <script>
+    const showedit = document.getElementsByClassName("edit_group");
+    const unEdit = document.getElementsByClassName('un-form-edit');
+    const myForme = document.getElementsByClassName("form-edit");
+  
+    for (var i = 0; i < showedit.length; i++) {
+      (function(index) {
+        showedit[index].addEventListener("click", function() {
+          var groupId = this.id.split("_")[2];
+          // code to edit group with ID = groupId
+    
+          myForme[index].style.display = 'block';
+          unEdit[index].addEventListener('click', function() {
+            // Xóa lớp 'hidden' trên form
+            myForme[index].style.display = 'none';
+          });
+        });
+      })(i);
+    }
+    // Thêm sự kiện click cho button
+    {% comment %} showedit.addEventListener('click', function() {
+      // Xóa lớp 'hidden' trên form
+      myForme.style.display = 'block';
+    }); {% endcomment %}
+    
+    </script>
+  </div>
+  <div class="status-field-container write-post-container border border-2">
+    <small><h4>The page is engaged</h4></small>
+    {% with is_small=False %}
+    {% for group in page_user %}
+      {% if user_profile.user.username != group.created_by.user.username %}
+        <div class="status-field-container write-post-container border border-2">
+          <div class="user-profile-box">
+            <div class="user-profile">
+                
+              <div>
+                <p>
+                  <p class="m-0"><a class="m-0" href="{% url 'page_index' id=group.id %}">{{ group.name }}</a></p>
+                </p>
+                <small>Follow: {{ group.follow.count }}</small>
+                <small>Created By: {{ group.created_by.nickname }}</small>
+              </div>
+            </div>
+            <div>
+              <p>
+                <a class="btn" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  <i class="fas fa-ellipsis-v"></i>
+                </a> 
+              </p>
+              <div class="collapse" id="collapseExample2">
+                <div class="card card-body">
+
+                  <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="exit_page"> 
+                    <input type="hidden" name="page_id" value="{{ group.id }}">
+                    <button type="submit" style="border: 2px; background-color: aliceblue;">Unfollow</button>
+                  </form>
+
+                </div>
+              </div>
+             
+            </div>
+          </div>
+          {% comment %} <div class="status-field">
+            <p>{{ group.description }}</p>
+          </div> {% endcomment %}
+        </div>
+        {% with is_small=True %}{% endwith %}
+      {% endif %}
+      
+    {% endfor %}
+    {% if is_small %}
+
+      <div class="status-field-container write-post-container">
+        <div class="user-profile-box">
+          <div class="user-profile">
+            <div>
+              <small>No page</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %} {% endwith %}
+  </div>
+  <div class="status-field-container write-post-container border border-2">
+    <small><h4>Other Page</h4></small>
+    {% with is_small=False %}
+    {% for group in page_userk %}
+    {% if group.created_by.user.username != user_profile.user.username  %}
+      
+        <div class="status-field-container write-post-container border border-2">
+          <div class="user-profile-box">
+            <div class="user-profile">
+                
+              <div>
+                <p>
+                  <p class="m-0">{{ group.name }}</p>
+                </p>
+                <small>Follow: {{ group.follow.count }}</small>
+                <small>Created By: {{ group.created_by.nickname }}</small>
+              </div>
+            </div>
+            <div>
+              <p>
+                <a class="btn" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  <i class="fas fa-ellipsis-v"></i>
+                </a> 
+              </p>
+              <div class="collapse" id="collapseExample">
+                <div class="card card-body">
+
+                  <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_follow"> 
+                    <input type="hidden" name="page_id" value="{{ group.id }}">
+                    <button type="submit" style="border: 2px; background-color: aliceblue;">Follow</button>
+                  </form>
+
+                </div>
+              </div>
+             
+            </div>
+          </div>
+          {% comment %} <div class="status-field">
+            <p>{{ group.description }}</p>
+          </div> {% endcomment %}
+        </div>
+        {% with is_small=True %}{% endwith %}
+      {% endif %}
+    {% endfor %}
+    {% if is_small %}
+
+      <div class="status-field-container write-post-container">
+        <div class="user-profile-box">
+          <div class="user-profile">
+            <div>
+              <small>No group</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %} {% endwith %}
+  </div>
+  <button type="button" class="btn-LoadMore" onclick="LoadMoreToggle()">Load More</button>
+{% endblock %}

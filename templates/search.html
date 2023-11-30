@@ -1,0 +1,58 @@
+{% extends 'baseindex.html' %}
+{% block body_block %}
+{% load static %}
+<div class="content-area">
+
+<h5 class="font-monospace">Search Results for "{{ query }}":</h5>
+<ul>
+  {% if results %}
+  <div class="status-field-container write-post-container border border-2">
+
+    {% for result in results %}
+    
+    {%if result.user %}
+    <li style="list-style-type: none;">
+    <div class="status-field-container write-post-container border border-2">
+      <div class="user-profile-box">
+        <div class="user-profile">
+            <img class="border border-info rounded-pill" src="{{ result.profile_pic.url }}" alt="" />
+            <div>
+              <a href="{% url 'other_profile' id=result.user.id %}" style="text-decoration:none;" id="user_{{ result.user.id }}">
+                <p>Name: {{ result.nickname }}</p></a>
+              <small>Friend: {{ result.friends.count }} </small> 
+            </div>
+          </div>
+        <div>
+      </div>
+      </li>
+    {% endif %}     
+        {% if result.name %}
+                <div class="status-field-container write-post-container border border-2">
+                  <div class="user-profile-box">
+                    <div class="user-profile">
+                      <div>
+                        <p>
+                          <h5>Group Name: <a href="{{ group.get_absolute_url }}">{{ result.name }}</a></h5>
+                        </p>
+                        <small>Members: {{ result.members.count }}</small>
+                        <small>Created By: {{ result.created_by.username }}</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="status-field">
+                    <p>{{ result.description }}</p>
+                  </div>
+                </div>
+        {% endif %}
+        
+        
+    {% endfor %}
+  </div>
+  {% else %}
+    <p>No Results Found.</p>
+  {% endif %}
+</ul>
+
+
+</div>
+  {%endblock%}

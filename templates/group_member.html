@@ -1,0 +1,207 @@
+{% extends 'baseindex.html' %}
+{% block body_block %}
+{% load static %}
+<style>
+    a:hover {
+      color: darkblue;
+    }
+    .biagroup {
+        color: #fff;
+        position: absolute;
+        top: 10px
+        }
+</style>
+
+<div class="content-area">
+    <img src="{% static  'images/backgrowgroup.jpg' %}" style="width: 100%; height: 250px; border-radius: 10px;" alt="">   
+    {% if user_profile != groups_request.created_by %}
+    <form class="biagroup" style="text-align: end;" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="out_group"> 
+      <button type="submit" class="border border-0 p-2 ms-2" style="border-radius: 10%; background-color:#f8e8e4 ;"><i class="fa-solid fa-right-from-bracket fa-rotate-180" style="color: #1f5129;"></i> Out Group</button>
+    </form>
+    {% endif %}
+    <div class="biagroup" style="border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;margin-top: 180px;width: 100%;height: 60px;background-color: #f0f2f5;color: #626262;">
+        <h5 class="ps-3 m-0" style=""><a class="m-0" href="{% url 'groupindex' id=groups_request.id %}">{{groups_request.name}}</a></h5>
+        <p class="ps-4 p-1 d-block">Members: {{groups_request.members.count}}  |  Description: {{groups_request.description}}</p>
+    </div>
+
+    <div class="status-field-container write-post-container border border-2">
+        <h5 class="ps-3 m-0" style="">List Admin: </h5>     
+        <li style="list-style-type: none;">
+            <div class="status-field-container write-post-container border border-2">
+              <div class="user-profile-box">
+                <div class="user-profile">
+                    <img class="border border-info rounded-pill" src="{{ groups_request.created_by.profile_pic.url }}" alt="" />
+                    <div>
+                      <a href="{% url 'other_profile' id=groups_request.created_by.user.id %}" style="text-decoration:none;" id="user_{{ result.user.id }}">
+                        <p>Name: {{ groups_request.created_by.nickname }} | Admin Create</p></a>
+                      <small>Friend: {{ groups_request.created_by.friends.count }} </small> 
+                    </div>
+                  </div>
+                <div>
+                    
+              </div>
+              </li>
+
+        {% for member in groups_request.ad_group.all %}       
+        <li style="list-style-type: none;">
+            <div class="status-field-container write-post-container border border-2">
+              <div class="user-profile-box">
+                <div class="user-profile">
+                    <img class="border border-info rounded-pill" src="{{ member.profile_pic.url }}" alt="" />
+                    <div>
+                      <a href="{% url 'other_profile' id=member.user.id %}" style="text-decoration:none;" id="user_{{ result.user.id }}">
+                        <p>Name: {{ member.nickname }} | Admin</p></a>
+                      <small>Friend: {{ member.friends.count }} </small> 
+                    </div>
+                  </div>
+                  
+                <div>
+                  {%if user_profile.user == groups_request.created_by.user  %}
+            
+                  <div>
+                      <div>
+                          <p>
+                            <a class="btn" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample">
+                              <i class="fas fa-ellipsis-v"></i>
+                            </a> 
+                          </p>
+                          <div class="collapse" id="collapseExample3">
+                            <div class="card card-body">
+                              
+                              <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="remove_ad"> 
+                                <input type="hidden" name="member_id" value="{{ member.id }}">
+        
+                                <button type="submit" style="border: 2px; background-color: aliceblue;">Remove Admin</button>
+                              </form>
+            
+                            </div>
+                          </div>
+                         
+                        </div>
+        
+                </div>
+              {% endif %}
+              </div>
+              </li>
+        {% endfor %}
+
+        <h5 class="p-3 m-0" style="">List Members: </h5>
+
+        {% for member in groups_request.members.all %}
+        {%for ad_group in groups_request.ad_group.all %}
+        {%if member.user != groups_request.created_by.user and member.user != ad_group.user %}
+        
+        {% comment %} member {% endcomment %}
+        <li style="list-style-type: none;">
+        <div class="status-field-container write-post-container border border-2">
+          <div class="user-profile-box">
+            <div class="user-profile">
+                <img class="border border-info rounded-pill" src="{{ member.profile_pic.url }}" alt="" />
+                <div>
+                  <a href="{% url 'other_profile' id=member.user.id %}" style="text-decoration:none;" id="user_{{ result.user.id }}">
+                    <p>Name: {{ member.nickname }} | Members1</p></a>
+                  <small>Friend: {{ member.friends.count }} </small> 
+                </div>
+              </div>
+              
+        {%if user_profile.user == groups_request.created_by.user  or user_profile.user == ad_group.user%}              
+            <div>
+                <div>
+                    <p>
+                      <a class="btn" data-bs-toggle="collapse" href="#collapseExample_{{ member.id }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <i class="fas fa-ellipsis-v"></i>
+                      </a> 
+                    </p>
+                    <div class="collapse" id="collapseExample_{{ member.id }}">
+                      <div class="card card-body">
+                        
+                        <form method="post">
+                          {% csrf_token %}
+                          <input type="hidden" name="action" value="exit_group"> 
+                          <input type="hidden" name="member_id" value="{{ member.id }}">
+
+                          <button type="submit" style="border: 2px; background-color: aliceblue;">Remove Members</button>
+                        </form>
+                        <form method="post">
+                          {% csrf_token %}
+                          <input type="hidden" name="action" value="authorization"> 
+                          <input type="hidden" name="member_id" value="{{ member.id }}">
+
+                          <button type="submit" style="border: 2px; background-color: aliceblue;">Authorization</button>
+                        </form>
+      
+                      </div>
+                    </div>
+                   
+                  </div>
+
+          </div>
+        {% endif %}
+      </li>
+      {% endif %}  
+
+      {%empty%}
+      {%if member.user != groups_request.created_by.user %}
+        
+      {% comment %} member {% endcomment %}
+      <li style="list-style-type: none;">
+      <div class="status-field-container write-post-container border border-2">
+        <div class="user-profile-box">
+          <div class="user-profile">
+              <img class="border border-info rounded-pill" src="{{ member.profile_pic.url }}" alt="" />
+              <div>
+                <a href="{% url 'other_profile' id=member.user.id %}" style="text-decoration:none;" id="user_{{ result.user.id }}">
+                  <p>Name: {{ member.nickname }} | Members</p></a>
+                <small>Friend: {{ member.friends.count }} </small> 
+              </div>
+            </div>
+            
+      {%if user_profile.user == groups_request.created_by.user  %}
+            
+          <div>
+              <div>
+                  <p>
+                    <a class="btn" data-bs-toggle="collapse" href="#collapseExample_{{ member.id }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </a> 
+                  </p>
+                  <div class="collapse" id="collapseExample_{{ member.id }}">
+                    <div class="card card-body">
+                      
+                      <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="exit_group"> 
+                        <input type="hidden" name="member_id" value="{{ member.id }}">
+
+                        <button type="submit" style="border: 2px; background-color: aliceblue;">Remove Members</button>
+                      </form>
+                      <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="authorization"> 
+                        <input type="hidden" name="member_id" value="{{ member.id }}">
+
+                        <button type="submit" style="border: 2px; background-color: aliceblue;">Authorization</button>
+                      </form>
+    
+                    </div>
+                  </div>
+                 
+                </div>
+
+        </div>
+      {% endif %}
+    </li>
+    {% endif %}
+      {%endfor%}
+        {% endfor %}
+    </div>
+
+    
+ 
+    <button type="button" class="btn-LoadMore" onclick="LoadMoreToggle()">Load More</button>
+</div>
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends 'baseindex.html' %}
+{% block body_block %}
+{% load static %}
+<style>
+    a:hover {
+      color: darkblue;
+    }
+    .biagroup {
+        color: #fff;
+        position: absolute;
+        top: 10px
+        }
+</style>
+<div class="content-area">
+    <img src="{% static  'images/backgrowgroup.jpg' %}" style="width: 100%; height: 250px; border-radius: 10px;" alt="">     
+    <div class="biagroup" style="border-bottom-left-radius: 10px;border-bottom-right-radius: 10px;margin-top: 180px;width: 100%;height: 60px;background-color: #f0f2f5;color: #626262;">
+        <h5 class="ps-3 m-0" style="">{{groups_request.name}}</h5>
+        <p class="ps-4 p-1 d-block"><a href="{% url 'page_follow' id=page_request.id %}">
+              Follow: {{page_request.follow.count}}</a> 
+               |  Description: {{page_request.description}}
+              
+              </p>
+    </div>
+   {% if page_request.created_by.user == user_profile.user %}
+    <div class="write-post-container">
+        <div class="user-profile">
+            <img src="{{ user_profile.profile_pic.url }}" style="width: 45px; height: 45px" alt="">
+            <div>
+                <p> {{ page_request.name }}</p>
+                <small>Public <i class="fas fa-caret-down"></i></small>
+            </div>
+        </div>
+
+        <div class="post-upload-textarea">
+            <form method="post" enctype="multipart/form-data" id="myForm" onsubmit="return validateTextArea()">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="post"> 
+
+                <textarea class="title" name="title" placeholder="What's on your mind?" id="title" cols="30" rows="3"></textarea>
+                <div class="add-post-links" id="preview">
+                  {% comment %} <a href="" id="upload-btn"><img src="{% static 'images/photo.png' %}" alt="" />Photo/Video</a>
+                  <input type="file" name="images" id="images" multiple />
+                  {% endcomment %}
+                  <label for="images" id="upload-btn">
+                    <a style="padding: 9px;">
+                      <img src="{% static 'images/photo.png' %}" alt="" />
+                      Photo
+                    </a>
+                  </label>
+                  <input type="file" name="images" id="images" multiple style="display:none;" />
+                  <a href="{% url 'create_post' %}"><img src="{% static 'images/feeling.png' %}" alt="" />Feeling Activity</a>
+                  <button type="submit" class="btn btn-primary">Đăng</button>
+
+                  <script src="https://cdn.jsdelivr.net/npm/cropperjs@latest/dist/cropper.min.js"></script>
+                  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@latest/dist/cropper.min.css" />
+
+                  <script>
+                    const form = document.getElementById('myForm')
+                    const input = document.getElementById('images')
+                    const preview = document.getElementById('preview')
+                    
+                    input.addEventListener('change', (event) => {
+                      // lấy tệp được chọn
+                      const files = event.target.files
+                    
+                      for (let i = 0; i < files.length; i++) {
+                        const file = files[i]
+                        const reader = new FileReader()
+                    
+                        reader.onload = (e) => {
+                          const newImage = document.createElement('img')
+                          newImage.setAttribute('src', e.target.result)
+                          preview.appendChild(newImage)
+                    
+                          newImage.width = 100
+                          newImage.height = 100 * (newImage.naturalHeight / newImage.naturalWidth)
+                        }
+                    
+                        reader.readAsDataURL(file)
+                      }
+                    })
+                    function validateTextArea() {
+                        var textarea = document.getElementById("title");
+                        if (textarea.value.trim() == "") {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                  </script>
+                </div>
+              </form>
+        </div>
+    </div>
+    
+    {% endif %}
+
+    {% comment %}Bài viết{% endcomment %}
+    {% for post in posts %}
+    <div class="status-field-container write-post-container border border-1">
+      <div class="user-profile-box">
+        <div class="user-profile">
+          <img src="{{ post.user.profile_pic.url }}" style="width: 45px; height: 45px" alt="" />
+                  <div>
+                    <p><a style="text-decoration: none; color:#626262; hover-color:aqua" href="{% url 'other_profile' id=post.user.id %}" id="user_{{ post.user.id }}">
+                        {{ page_request.name}}</a></p>
+                    <small>{{ post.created_at }}</small>
+                  </div>
+        </div>
+        {% if user_profile.user == groups_request.created_by.user or user_profile == post.user %}
+        <div>
+          <p>
+            <a class="btn" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample">
+              <i class="fas fa-ellipsis-v"></i>
+            </a> 
+          </p>
+          <div class="collapse" id="collapseExample1">
+            <div class="card card-body">   
+           
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete_post"> 
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <button class="btn m-0"  type="submit">Delete</button>
+               </form>
+         
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+      <div class="status-field"style="display: block;
+              overflow: hidden;">
+                <p>{{ post.title }} </p>
+
+                {% for image in post.image_set.all %}
+                <p>csvsdv</p>
+                {%if post.image_set.count == 1 %}
+               
+                  <img style="width: 50%;display: block;
+                  margin-left: auto;
+                  margin-right: auto; " src="{{ image.images.url }}" />
+                  {%else%}
+                  <img style="width: 40%;
+                  float: left
+                  padding: 5px; "
+                   src="{{ image.images.url }}" />
+                  {%endif%}
+                {% endfor %}
+             
+      </div>
+      {% comment %}tym va bình luận{% endcomment %}
+      <!-- Nút like -->
+      <div class="post-reaction">
+        <div class="activity-icons">
+          <div>
+            <button style="border: none;background-color: #ffffff;" type="button" onclick="likePost({{ post.id }})">
+              <img src="{% static 'images/like.png' %}" alt="" />
+              {% comment %} <span>{% with likes=post.like_set.all %}
+                {{ likes.count }} 
+              {% endwith %}</span> {% endcomment %}
+            </button>
+          </div>
+
+          <div>
+                <button style="border: none;background-color: #ffffff;" type="button" id="btn-cmt">
+                  <img src="{% static 'images/comments.png' %}" alt="" />
+                  {% comment %} <span>{{ post.num_comment }}</span> {% endcomment %}
+                </button>
+          </div>
+          <div>
+            <img src="{% static 'images/share.png' %}" alt="" />35
+          </div> </br>
+
+          <div id="postComments_{{ post.id }}" class="show-cmt">
+            <ul>
+              {% for comment in comments %}
+                {% if post.id == comment.post.id %}
+                <div class="d-block m-3">
+                <div class="  rounded p-2 " style=" background-color: #f0f2f5;  display: block;">
+                <div>
+                <img src="{{ comment.author.profile_pic.url }}" style="width: 30px; height: 30px; border-radius: 50%;" alt="" />
+                 <strong >{{ comment.author.nickname }}</strong>
+                </div>
+                 <br>
+                  <p class="ps-5" style="margin: auto;">{{ comment.content }}</p>
+                
+                
+                </div>
+                <small class="p-3">{{ comment.created_at|timesince  }}</small>
+              </div>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+          <!-- Form để thêm bình luận -->
+          <div class="form-check-inline "  id='show-form'>           
+            <form method="post" class="row g-2" enctype="multipart/form-data" id="add-comment-form">
+              {% csrf_token %}
+               <input type="hidden" name="action" value="comment"> 
+                <input type="hidden" name="post_id" value="{{ post.id }}" />
+                <div class="col-auto ms-5">
+                <input class="form-control"  placeholder="Comment"  name="content"></input>
+              </div>
+              <div class="col-auto">
+                <button class = "create-comment btn btn-info" type="submit">Comment</button>
+              </div>
+              </form>
+            </div>
+
+        </div>
+        
+      </div>
+    </div>
+  {% endfor %}
+  <script>
+    {% comment %} $(document).ready(function() {
+      $('#show-form').hide();
+      $('.show-cmt').hide();
+      $('#btn-cmt').click(function() {
+          $('#show-form').show();
+           $('.show-cmt').show();               
+          
+      });
+    }); {% endcomment %}
+  </script>
+    <button type="button" class="btn-LoadMore" onclick="LoadMoreToggle()">Load More</button>
+</div>
+{% endblock %}

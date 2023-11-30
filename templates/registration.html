@@ -1,0 +1,85 @@
+
+{% load static %}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+	
+	<!-- Custom Theme files -->
+	<!-- for-mobile-apps -->
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<meta name="keywords" content="Classy Login form Responsive, Login form web template, Sign up Web Templates, Flat Web Templates, Login signup Responsive web template, Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
+	<!-- //for-mobile-apps -->
+	<!--Google Fonts-->
+	<link href='//fonts.googleapis.com/css?family=Roboto+Condensed:400,700' rel='stylesheet' type='text/css'>
+	<link href="{% static 'css/register.css' %}" rel="stylesheet" type="text/css" media="all"/>
+</head>
+<body class="registerb">
+    <div class="content-w3ls">
+        <div class="content-agile1">
+            <h2 class="agileits1">Register</h2>
+            <p class="agileits2">Bạn đã có tài khoản? 
+                <a class="px-1 text-blue-600" href="{% url 'user_login' %}">Login</a></p>
+        </div>
+        
+        <div class="content-agile2">
+            <form action="{% url 'register' %}" method="POST" enctype="multipart/form-data" >
+                {% csrf_token %} 
+                
+                <div class="form-control w3layouts"> 
+                    <input type="text" id="username" name="username" placeholder="Username" title="Please enter your Username" required="">
+                </div>
+    
+                <div class="form-control w3layouts">	
+                    <input type="email" id="email" name="email" placeholder="Email" title="Please enter a valid email" required="">
+                </div>
+    
+                <div class="form-control agileinfo">	
+                    <input type="password" class="lock" name="password" placeholder="Password" id="password1" required="">
+                </div>	
+    
+                <div class="form-control agileinfo">	
+                    <input type="password" class="lock" name="confirm-password" placeholder="Confirm Password" id="password2" required="">
+                </div>
+                <div class="form-control w3layouts">	
+                    <input type="url" id="email" name="portfolio_site" placeholder="Portfolio Site" title="Please enter a valid Portfolio Site" required="">
+                    
+                </div>			
+                <div class="form-control agileinfos">
+                    <div class="drag-area max-w-md text-white  w-full lg:w-88 rounded-2xl border-2 border-dashed border-neutral-5 p-6 flex flex-col items-center justify-center">
+            
+                    <header class="text-lg">Kéo và Thả để tải ảnh lên</header>
+                    <span class="my-3">Hoặc</span>
+                    {% comment %} <button class="px-4 py-2 rounded bg-neutral-100 text-blue-600">Chọn file</button> {% endcomment %}
+                    <input type="file" class ="profile_pic" name="profile_pic" />
+                  </div>
+                <input type="submit" class="register" value="Register">
+            </form>
+            <script type="text/javascript">
+                window.onload = function () {
+                    document.getElementById("password1").onchange = validatePassword;
+                    document.getElementById("password2").onchange = validatePassword;
+                }
+                function validatePassword(){
+                    var pass2=document.getElementById("password2").value;
+                    var pass1=document.getElementById("password1").value;
+                    if(pass1!=pass2)
+                        document.getElementById("password2").setCustomValidity("Passwords Don't Match");
+                    else
+                        document.getElementById("password2").setCustomValidity('');	 
+                        //empty string means no validation error
+                }
+            </script>
+            
+        </div>
+        <div class="clear"></div>
+    </div>
+    
+      <script type="text/javascript" src="{% static "js/register.min.js" %}"></script>
+</body>
+
+
